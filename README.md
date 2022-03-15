@@ -1,34 +1,62 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Problems
 
-## Getting Started
+"HTML Fragments" - A piece of HTML code hosted in the _origin site_ that can be consumed and included into other sites as part of their HTML code. The other sites fetch these fragments via URLs like https://domain.com/fragments/header and https://domain.com/fragments/footer.
 
-First, run the development server:
+For example:
 
-```bash
-npm run dev
-# or
-yarn dev
+```
+<div id="some_fragment">
+  <section>I am inside a section</section>
+  <ul>
+    <li>...</li>
+    <li>...</li>
+  </ul>
+  <section>...</section>
+</div>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The _origin site_ has switched over to the Next.js framework, and the React components that were used to construct HTML Fragments are now padded with other HTML tags when they are delivered as Next.js pages.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```
+<!DOCTYPE html>
+<html lang="en">
+  <head>...</head>
+  <body>
+    ...
+    ...
+    [HTML FRAGMENT]
+  </body>
+</html>
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Solution
 
-## Learn More
+Instead of rendering these "HTML Fragments" as Next.js `/pages/...`, they can be delivered using APIs `/pages/api/fragments/[component]/[format].js`. The serverless function takes in 2 parameters:
 
-To learn more about Next.js, take a look at the following resources:
+- `component` - used to find the correct base React component used to render the HTML Fragment
+- `format` - used to determine the type of file required, it can be `css`, `html`, or `js`. (The naming of this parameter could have been better.)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. When `html` is requested, the serverless function will render the relevant React component and converts it into HTML using `ReactDOMServer.renderToStaticMarkup(<SomeComponent></SomeComponent>)`.
+2. When `css` or `js` is requested, the serverless function will return the content of the relevant static files imported using `raw-loader`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+PS: Due to the limitation of Next.js' `/pages/api/...` runtime, you will need to `import` all the static files at the start of the function or switch the APIs over to use the Node runtime `/api/...` so that these files can be included into the serverless functions by `includedFiles`. More information is available at https://vercel.com/support/articles/how-can-i-use-files-in-serverless-functions.
 
-## Deploy on Vercel
+## Demo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The header component is rendered as an HTML page at https://72401-nextjs.vercel-support.app/.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The same header component can be fetched as pure HTML at https://72401-nextjs.vercel-support.app/api/fragments/header/html or by running: 
+
+```bash
+curl https://72401-nextjs.vercel-support.app/api/fragments/header/html
+```
+
+<img width="488" alt="image" src="https://user-images.githubusercontent.com/179761/158372307-a509225b-bf3e-41c4-b9aa-801abf745aaa.png">
+
+The css styles used by the component is available at https://72401-nextjs.vercel-support.app/api/fragments/header/css. Please note that this component uses Module CSS in this example.
+
+## Caching
+
+A `cache-control` header is not set in this example but it is highly recommended.
+
