@@ -1,7 +1,9 @@
+import { readFileSync } from 'fs'
+import { join } from 'path'
 import ReactDOMServer from 'react-dom/server';
 import HeaderComponent from '/components/HeaderComponent'
-import css from '!!raw-loader!/components/HeaderComponent/styles.module.css'
 
+const css = readFileSync(join(process.cwd(), 'components/HeaderComponent/styles.module.css'), 'utf8')
 
 export default function handler(req, res) {
   const { component, format } = req.query
