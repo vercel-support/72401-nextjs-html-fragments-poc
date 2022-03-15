@@ -1,3 +1,5 @@
+This POC demonstrates how a React component's HTML, CSS, and JS code can be served separately in Next.js.
+
 ## Problem
 
 "HTML Fragments" - A piece of HTML code hosted in the _origin site_ that can be consumed and included into other sites as part of their HTML code. The other sites fetch these fragments via URLs like https://domain.com/fragments/header and https://domain.com/fragments/footer.
