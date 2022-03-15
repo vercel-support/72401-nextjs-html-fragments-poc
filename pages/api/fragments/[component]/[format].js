@@ -4,9 +4,9 @@ import HeaderComponent from '../../../../components/HeaderComponent'
 const { readFileSync } = require('fs')
 const { join } = require('path')
 
-const styles = readFileSync(join(process.cwd(), '/components/HeaderComponent/styles.module.css'), 'utf8')
-
 export default async function handler(req, res) {
+  const styles = readFileSync(join(process.cwd(), '/components/HeaderComponent/styles.module.css'), 'utf8')
+  
   const { component, format } = req.query
   
   if (format === 'html') {
