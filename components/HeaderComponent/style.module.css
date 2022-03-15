@@ -1,0 +1,17 @@
+.HeaderComponent {
+  background: #0071ce;
+  color: #041f41;
+  padding: 0.5rem 1rem 2rem;
+  border-bottom: 4px solid #ffc220;
+}
+
+.HeaderComponent pre {
+  display: inline-block;
+  background: #999;
+  padding: 0 0.5rem;
+}
+
+.HeaderComponent section.children {
+  padding-left: 2rem;
+  border-bottom: 4px solid #ffffff;
+}
