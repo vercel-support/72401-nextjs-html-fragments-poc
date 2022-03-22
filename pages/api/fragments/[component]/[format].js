@@ -1,7 +1,7 @@
+import { readFileSync } from 'fs'
+import { join } from 'path'
 import ReactDOMServer from 'react-dom/server';
 import HeaderComponent from '/components/HeaderComponent'
-import css from '!!raw-loader!/components/HeaderComponent/styles.module.css'
-
 
 export default function handler(req, res) {
   const { component, format } = req.query
@@ -10,7 +10,8 @@ export default function handler(req, res) {
     const htmlFragment = ReactDOMServer.renderToStaticMarkup(<HeaderComponent>I am some inside content!</HeaderComponent>)
     res.status(200).send(htmlFragment)
   } else if (format === 'css') {
-
+    const file = join(process.cwd(), 'components/HeaderComponent/styles.module.css')
+    const css = readFileSync(file, 'utf8')
     res.status(200).send(css)
   } else {
     res.status(404).send('Error: 404')
